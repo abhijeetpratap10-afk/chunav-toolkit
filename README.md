@@ -4,7 +4,9 @@ Election-analysis tools for any Indian assembly seat, in any Indian language:
 
 1. **Roll OCR** (`ocr/`): turns Election Commission electoral-roll PDFs into an Excel sheet with one row per voter (EPIC no., name, relative, house, age, gender, part, section). It works for English and every Indian language that Tesseract can read.
 2. **Community analysis** (`analysis/`): adds a community column using surname rules you can edit per state, then builds booth- and panchayat-level totals.
-3. **Sanyojak Map** (`app/`): a Windows desktop app (Electron) with a map of every panchayat and booth. You group panchayats into areas, appoint a sanyojak per area and a sah-sanyojak per panchayat, see the community mix, run a booth-level vote model, plan the campaign and print or export everything.
+3. **Sanyojak Map** (`app/`): a desktop app (Electron, run from source) with a map of every panchayat and booth. You group panchayats into areas, appoint a sanyojak per area and a sah-sanyojak per panchayat, see the community mix, run a booth-level vote model, plan the campaign and print or export everything.
+
+**New to this?** Start with the step-by-step method: [How to do a caste-wise analysis of an assembly seat](docs/caste-analysis-guide.md).
 
 The app ships with **Demo Nagar 999**, a made-up seat, so you can try it straight away. Real seats are loaded as *region packs* (a folder with `region.json` + `panchayats.json`). You can switch between them in **Settings**, so one install can serve any seat in any state.
 
@@ -49,6 +51,7 @@ python classify.py ../ocr/voters.xlsx --rules rules/up.json -o voters_classified
 ```
 
 - `rules/up.json` is the Uttar Pradesh surname list (Hindi rolls). For another state, copy `rules/template.json` and fill in the groups, colours and blocs. See [docs/caste-rules.md](docs/caste-rules.md).
+- The output also has two sheets that help you improve the result. **Unknown surnames** lists the most frequent words the rules could not place, so you can add them to your state's rules. **Estimate check** is a hold-out test of how accurate the estimate is for each community.
 - **Community** comes from surname rules only. **Community (est.)** also uses first-name statistics and households for voters the rules could not place. In the app these are "old logic" and "new logic".
 - Estimates are for planning totals. They can be wrong for any single voter.
 
@@ -68,8 +71,7 @@ Then, in the app, open **Settings → Open region folder…** and choose `my-sea
 ```bash
 cd app
 npm install
-npm start            # run
-npm run dist         # build a Windows installer in app/dist
+npm start
 ```
 
 Tabs: **Map** (select panchayats, colour by area / block / largest group / vote model), **Areas** (sanyojak per area), **Blocks**, **Panchayats** (register with sah-sanyojak names and phones, booth details), **Strategy** (vote model, priority booths, organisation needed, outreach), **Future** (checklist to polling day) and **Settings** (region, party name, colours, community groups).
@@ -90,7 +92,7 @@ ocr/        roll2excel.py, get_languages.py, languages.py (per-language words), 
 analysis/   classify.py, build_region.py, rules/ (up.json, template.json)
 app/        Electron app; regions/demo is the made-up sample seat
 samples/    make_demo.py (rebuilds the demo seat through the whole pipeline)
-docs/       ocr.md, caste-rules.md, region-pack.md
+docs/       caste-analysis-guide.md (the method), ocr.md, caste-rules.md, region-pack.md
 ```
 
 ## License

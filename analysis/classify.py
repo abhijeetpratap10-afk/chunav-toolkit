@@ -93,34 +93,45 @@ def features(name, rel, generic):
     return f
 
 
-def estimate(rows, rules, min_prob=0.6):
-    """Naive Bayes on first names and relatives' names, learned from voters the rules
-    did classify, then a household vote for whatever is still unknown."""
-    known = [(r['_f'], r['group']) for r in rows if r['group']]
+def train(known):
+    """known: [(features, group)] -> naive Bayes model."""
     prior = Counter(g for _, g in known)
     feat = defaultdict(Counter)
     for fs, g in known:
         for x in fs:
             feat[g][x] += 1
-    tot = {g: sum(c.values()) for g, c in feat.items()}
-    vocab = len({x for c in feat.values() for x in c}) or 1
-    n = sum(prior.values()) or 1
+    return {'prior': prior, 'feat': feat, 'tot': {g: sum(c.values()) for g, c in feat.items()},
+            'vocab': len({x for c in feat.values() for x in c}) or 1, 'n': sum(prior.values()) or 1}
+
+
+def predict(model, fs, min_prob):
+    """Most likely group and its probability, or (None, p) when unsure or nothing is known."""
+    prior, feat, tot = model['prior'], model['feat'], model['tot']
+    if not fs or not prior or not any(feat[g][x] for g in feat for x in fs):
+        return None, 0.0
+    scores = {}
+    for g in prior:
+        sc = math.log(prior[g] / model['n'])
+        for x in fs:
+            sc += math.log((feat[g][x] + 0.5) / (tot[g] + 0.5 * model['vocab']))
+        scores[g] = sc
+    m = max(scores.values())
+    z = sum(math.exp(v - m) for v in scores.values())
+    g, pr = max(((g, math.exp(v - m) / z) for g, v in scores.items()), key=lambda t: t[1])
+    return (g, pr) if pr >= min_prob else (None, pr)
+
+
+def estimate(rows, rules, min_prob=0.6):
+    """Naive Bayes on first names and relatives' names, learned from voters the rules
+    did classify, then a household vote for whatever is still unknown."""
+    model = train([(r['_f'], r['group']) for r in rows if r['group']])
     for r in rows:
         r['est'], r['how'] = r['group'], 'surname' if r['group'] else ''
-        if r['group'] or not r['_f'] or not prior:
+        if r['group']:
             continue
-        scores = {}
-        for g in prior:
-            s = math.log(prior[g] / n)
-            for x in r['_f']:
-                s += math.log((feat[g][x] + 0.5) / (tot[g] + 0.5 * vocab))
-            scores[g] = s
-        m = max(scores.values())
-        z = sum(math.exp(v - m) for v in scores.values())
-        g, p = max(((g, math.exp(v - m) / z) for g, v in scores.items()), key=lambda t: t[1])
-        seen = any(feat[g2][x] for g2 in feat for x in r['_f'])
-        if seen and p >= min_prob:
-            r['est'], r['how'] = g, f'names {p:.0%}'
+        g, pr = predict(model, r['_f'], min_prob)
+        if g:
+            r['est'], r['how'] = g, f'names {pr:.0%}'
     house = defaultdict(Counter)
     for r in rows:
         if r['est'] and r.get('house'):
@@ -132,6 +143,50 @@ def estimate(rows, rules, min_prob=0.6):
                 g, k = c.most_common(1)[0]
                 if k / sum(c.values()) >= 0.7:
                     r['est'], r['how'] = g, 'household'
+
+
+def validate(rows, rules, min_prob=0.6, frac=0.1, seed=7):
+    """How good is the name-based estimate? Hide the surname of a random 10% of voters the
+    rules did classify, predict them from the remaining words, and compare."""
+    import random
+    rnd = random.Random(seed)
+    known = [r for r in rows if r['group']]
+    rnd.shuffle(known)
+    k = max(1, int(len(known) * frac))
+    test, trainset = known[:k], known[k:]
+    model = train([(r['_f'], r['group']) for r in trainset])
+    rule_words = set().union(*(ws for _, ws in rules.sets), *(ws for _, ws in rules.last), *(ws for _, ws in rules.prefix))
+    if rules.relsur:
+        rule_words |= rules.relsur[1]
+    stats = defaultdict(lambda: Counter())
+    for r in test:
+        fs = [x for x in r['_f'] if x.split(':', 1)[1] not in rule_words]   # pretend the surname is unknown
+        g, _ = predict(model, fs, min_prob)
+        st = stats[r['group']]
+        st['n'] += 1
+        if g:
+            st['guessed'] += 1
+            st['right'] += g == r['group']
+            stats[g]['claimed'] += 1
+            stats[g]['claimed_right'] += g == r['group']
+    tot = Counter()
+    for st in stats.values():
+        tot.update({k2: st[k2] for k2 in ('n', 'guessed', 'right')})
+    return stats, tot
+
+
+def unknown_words(rows, data, ix, rules, top=300):
+    """Most frequent last words among voters the rules could not place: candidates to add to the rules file."""
+    cnt, ex = Counter(), {}
+    for r, d in zip(rows, data):
+        if r['group']:
+            continue
+        for key in ('name', 'rel'):
+            ws = words(d[ix[key]] if ix[key] is not None and ix[key] < len(d) else '')
+            if len(ws) >= 2 and ws[-1] not in rules.generic:
+                cnt[ws[-1]] += 1
+                ex.setdefault(ws[-1], ' '.join(ws))
+    return [(w, n, ex[w]) for w, n in cnt.most_common(top)]
 
 
 # ---------- I/O ----------
@@ -180,6 +235,7 @@ def main():
     ap.add_argument('--name-col', help='column name or 0-based number of the voter name')
     ap.add_argument('--rel-col', help='column name or 0-based number of the relative name')
     ap.add_argument('--min-prob', type=float, default=0.6, help='confidence needed for a name-based estimate (default 0.6)')
+    ap.add_argument('--no-validate', action='store_true', help='skip the hold-out accuracy test of the estimate')
     a = ap.parse_args()
     to_ix = lambda v: int(v) if v and v.isdigit() else v
 
@@ -192,19 +248,26 @@ def main():
         r['_f'] = features(g('name'), g('rel'), rules.generic)
         rows.append(r)
     estimate(rows, rules, a.min_prob)
+    val = None if a.no_validate else validate(rows, rules, a.min_prob)
+    unk = unknown_words(rows, data, ix, rules)
 
     out = a.out or os.path.splitext(a.input)[0] + '_classified.xlsx'
-    write(out, head, data, rows, rules, ix)
+    write(out, head, data, rows, rules, ix, val, unk)
     n = len(rows)
     c1 = Counter(r['group'] for r in rows)
     c2 = Counter(r['est'] for r in rows)
     print(f'{n} voters. Unclassified by surname: {c1[None]} ({c1[None] * 100 / max(1, n):.1f}%), after estimate: {c2[None]} ({c2[None] * 100 / max(1, n):.1f}%)')
     for gid, k in c2.most_common():
         print(f'  {rules.label(gid):<30} {k:>8}  {k * 100 / max(1, n):5.1f}%')
+    if val:
+        _, t = val
+        print(f'Estimate check (10% of known voters with surnames hidden): guessed {t["guessed"] * 100 / max(1, t["n"]):.0f}%, '
+              f'right {t["right"] * 100 / max(1, t["guessed"]):.0f}% of those guesses. Details in the "Estimate check" sheet.')
+    print(f'Top unknown surname: {unk[0][0]} ({unk[0][1]} voters). Full list in the "Unknown surnames" sheet.' if unk else '')
     print(f'Saved {out}')
 
 
-def write(out, head, data, rows, rules, ix):
+def write(out, head, data, rows, rules, ix, val=None, unk=None):
     import openpyxl
     from openpyxl.styles import Font, PatternFill
     wb = openpyxl.Workbook()
@@ -236,7 +299,25 @@ def write(out, head, data, rows, rules, ix):
         for key, lg in (('group', 'surname'), ('est', 'estimate')):
             c = Counter(rules.label(r[key]) for _, r in items)
             sm.append([p, len(items), women, men, young, old, lg] + [c.get(l, 0) for l in labels])
-    for sh in (ws, sm):
+    sheets = [ws, sm]
+    if val:
+        stats, t = val
+        vs = wb.create_sheet('Estimate check')
+        vs.append(['Community', 'Test voters', 'Guessed', 'Coverage %', 'Right', 'Right % of guesses', 'Times predicted', 'Precision %'])
+        for gid, st in sorted(stats.items(), key=lambda kv: -kv[1]['n']):
+            vs.append([rules.label(gid), st['n'], st['guessed'], round(st['guessed'] * 100 / max(1, st['n']), 1), st['right'],
+                       round(st['right'] * 100 / max(1, st['guessed']), 1), st['claimed'], round(st['claimed_right'] * 100 / max(1, st['claimed']), 1)])
+        vs.append(['ALL', t['n'], t['guessed'], round(t['guessed'] * 100 / max(1, t['n']), 1), t['right'], round(t['right'] * 100 / max(1, t['guessed']), 1)])
+        vs.append([])
+        vs.append(['How to read: 10% of voters whose community the surname rules found had their surname hidden; the estimate then guessed from first names and relatives\' names. Low precision for a community means the estimate over-assigns it.'])
+        sheets.append(vs)
+    if unk:
+        us = wb.create_sheet('Unknown surnames')
+        us.append(['Word', 'Voters', 'Example name', 'Add to group (fill in, then copy into the rules file)'])
+        for w, n, e in unk:
+            us.append([w, n, e, ''])
+        sheets.append(us)
+    for sh in sheets:
         for c in sh[1]:
             c.font = Font(bold=True, color='FFFFFF')
             c.fill = PatternFill('solid', fgColor='2C3E50')
