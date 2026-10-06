@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sanyojak Map</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand"><b>Sanyojak Map</b><span class="hi"></span></div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button type="button" role="tab" data-tab="map" aria-selected="true">Map</button>
+      <button type="button" role="tab" data-tab="areas" aria-selected="false">Areas</button>
+      <button type="button" role="tab" data-tab="blocks" aria-selected="false">Blocks</button>
+      <button type="button" role="tab" data-tab="reg" aria-selected="false">Panchayats</button>
+      <button type="button" role="tab" data-tab="strategy" aria-selected="false">Strategy</button>
+      <button type="button" role="tab" data-tab="future" aria-selected="false">Future</button>
+      <button type="button" role="tab" data-tab="settings" aria-selected="false">Settings</button>
+    </nav>
+    <div class="actions">
+      <span id="saved" class="muted"></span>
+      <div class="menuwrap">
+        <button type="button" id="btnPrint" class="btn" aria-haspopup="menu" aria-expanded="false" title="Ctrl+P">Print ▾</button>
+        <div id="pmenu" class="menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-pact="tab">Print this tab…</button>
+          <button type="button" role="menuitem" data-pact="choose">Choose what to print…</button>
+        </div>
+      </div>
+      <button type="button" id="btnExport" class="btn">Export Excel</button>
+      <div class="menuwrap">
+        <button type="button" id="btnMenu" class="btn" aria-haspopup="menu" aria-expanded="false">Backup ▾</button>
+        <div id="menu" class="menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-act="saveBackup">Save a backup file…</button>
+          <button type="button" role="menuitem" data-act="restore">Restore from backup…</button>
+          <button type="button" role="menuitem" data-act="openFolder">Open data folder</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="statusbar"><div class="kpis" id="kpis"></div></div>
+
+  <main>
+    <section id="view-map" class="view">
+      <div class="mapcol">
+        <div class="maptools">
+          <span class="flabel">Colour by</span>
+          <div class="seg" id="colorby" role="group" aria-label="Colour pins by">
+            <button type="button" data-mode="area" aria-pressed="true">Area</button>
+            <button type="button" data-mode="block" aria-pressed="false">Block</button>
+            <button type="button" data-mode="caste" aria-pressed="false">Largest group</button>
+            <button type="button" data-mode="model" aria-pressed="false">Vote model</button>
+          </div>
+          <button type="button" id="btnSelect" class="btn toggle" aria-pressed="false" title="Drag a box on the map to select panchayats. Hold Shift to add to the selection.">Select panchayats</button>
+          <select id="fShow" aria-label="Show">
+            <option value="all">All panchayats</option>
+            <option value="none">Not in any area</option>
+            <option value="nosah">No sah-sanyojak yet</option>
+          </select>
+          <input id="qMap" type="search" placeholder="Find panchayat, village or booth" aria-label="Search">
+          <div class="menuwrap">
+            <button type="button" id="btnLayers" class="btn" aria-haspopup="true" aria-expanded="false">Layers ▾</button>
+            <div id="layers" class="menu layers" hidden></div>
+          </div>
+          <span class="muted" id="mapcount"></span>
+          <div class="zoombtns">
+            <button type="button" id="zwide" class="btn" title="Zoom out to see neighbouring districts, tehsils and cities">Surroundings</button>
+            <button type="button" id="zin" class="sq" aria-label="Zoom in">+</button>
+            <button type="button" id="zout" class="sq" aria-label="Zoom out">−</button>
+            <button type="button" id="zreset" class="sq" aria-label="Reset view" title="Back to the panchayats">⤢</button>
+          </div>
+        </div>
+        <div class="blockbar" id="blockbar"></div>
+        <div class="mapwrap">
+          <svg id="map" role="img" aria-label="Map of the seat with panchayats"></svg>
+          <div class="selbar" id="selbar" hidden></div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <aside id="inspector" aria-live="polite"></aside>
+    </section>
+
+    <section id="view-areas" class="view page" hidden></section>
+    <section id="view-blocks" class="view page" hidden></section>
+    <section id="view-reg" class="view page" hidden></section>
+    <section id="view-strategy" class="view page" hidden></section>
+    <section id="view-future" class="view page" hidden></section>
+    <section id="view-settings" class="view page" hidden></section>
+  </main>
+</div>
+
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="map.js"></script>
+<script src="renderer.js"></script>
+<script src="strategy.js"></script>
+<script src="print.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

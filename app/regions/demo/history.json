@@ -1,0 +1,44 @@
+{
+ "elections": [
+  {
+   "year": 2022,
+   "level": "VS",
+   "electors": 80500,
+   "polled": 49100,
+   "turnout": 61.0,
+   "winner": "Candidate One (Party A)",
+   "margin": 1840,
+   "results": [
+    {
+     "candidate": "Candidate One",
+     "party": "Party A",
+     "votes": 20130,
+     "pct": 41.0
+    },
+    {
+     "candidate": "Candidate Two",
+     "party": "Party B",
+     "votes": 18290,
+     "pct": 37.3
+    },
+    {
+     "candidate": "Candidate Three",
+     "party": "Party C",
+     "votes": 7400,
+     "pct": 15.1
+    },
+    {
+     "candidate": "Others",
+     "party": "",
+     "votes": 3280,
+     "pct": 6.6
+    }
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "label": "Invented for the demo"
+  }
+ ]
+}

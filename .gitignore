@@ -1,0 +1,27 @@
+# ---- never commit voter data ----
+# Electoral roll PDFs, OCR output, classified voter lists and contact backups contain
+# personal information. Keep them outside the repo or in a folder listed here.
+*.pdf
+*.xlsx
+*.xls
+*.csv
+!app/regions/demo/parts.csv
+*.cache/
+private/
+data/
+store*.json
+*backup*.json
+
+# real region packs: only the made-up demo is published
+app/regions/*
+!app/regions/demo/
+
+# tools
+node_modules/
+dist/
+ocr/tessdata/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+Thumbs.db

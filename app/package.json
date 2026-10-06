@@ -1,0 +1,30 @@
+{
+  "name": "chunav-sanyojak-map",
+  "version": "1.0.0",
+  "description": "Booth and panchayat organiser for any Indian assembly seat: areas, sanyojak / sah-sanyojak contacts, community mix and a booth-level vote model",
+  "main": "main.js",
+  "author": "Abhijeet",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.chunavtoolkit.sanyojakmap",
+    "productName": "Sanyojak Map",
+    "win": { "target": "nsis", "icon": "icon.ico" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "files": [
+      "main.js", "preload.js", "index.html", "styles.css",
+      "renderer.js", "map.js", "strategy.js", "print.js", "settings.js",
+      "icon.ico", "regions/**/*", "!regions/**/parts.csv", "vendor/**/*", "node_modules/xlsx/**/*"
+    ]
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

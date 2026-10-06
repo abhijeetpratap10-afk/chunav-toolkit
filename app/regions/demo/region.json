@@ -1,0 +1,181 @@
+{
+ "id": "demo",
+ "name": "Demo Nagar",
+ "local_name": "डेमो नगर",
+ "number": "999",
+ "state": "Demo State (made-up data)",
+ "_note": "Everything in this region is invented. It shows how the app works.",
+ "model": {
+  "party": "Party A",
+  "support_source": "made-up numbers for the demo",
+  "groups": [
+   {
+    "k": "upper",
+    "label": "Upper castes",
+    "bloc": "Upper caste",
+    "members": [
+     "Brahmin",
+     "Kshatriya / Rajput",
+     "Gupta / Vaishya",
+     "Srivastava / Kayastha"
+    ]
+   },
+   {
+    "k": "obc",
+    "label": "Non-Yadav OBC",
+    "bloc": "OBC",
+    "members": [
+     "Kurmi / Patel / Verma",
+     "Maurya / Shakya",
+     "Nishad / Kewat / Kahar",
+     "Pal",
+     "Prajapati",
+     "Vishwakarma",
+     "Soni / Sonkar",
+     "Nai",
+     "Lodhi",
+     "Rajbhar",
+     "Mali / Murao"
+    ]
+   },
+   {
+    "k": "yadav",
+    "label": "Yadav",
+    "bloc": "OBC",
+    "members": [
+     "Yadav"
+    ]
+   },
+   {
+    "k": "sc",
+    "label": "Scheduled Castes",
+    "bloc": "SC",
+    "members": [
+     "SC (sub-caste not known)",
+     "Pasi (SC)",
+     "Chamar / Jatav (SC)",
+     "Kori (SC)",
+     "Dhobi (SC)",
+     "Valmiki (SC)",
+     "Khatik (SC)",
+     "Mehtar / Bhangi (SC)",
+     "Gond / Dom (SC)"
+    ]
+   },
+   {
+    "k": "muslim",
+    "label": "Muslim",
+    "bloc": "Muslim",
+    "members": [
+     "Muslim"
+    ]
+   }
+  ],
+  "support": {
+   "upper": 70,
+   "obc": 55,
+   "yadav": 20,
+   "sc": 35,
+   "muslim": 10
+  },
+  "calibrate_to": {
+   "share": 0.41,
+   "label": "the 2022 result (made up)"
+  },
+  "turnout": 60,
+  "target": 45,
+  "poll_date": ""
+ },
+ "outreach": {
+  "SC": "Example text: welfare-scheme contact, representation in booth committees and respect at every event."
+ },
+ "risks": [
+  "Example watch-list item: a strong rival candidate in the city wards."
+ ],
+ "blocks": [
+  {
+   "hi": "पूर्वपुर",
+   "en": "Purvapur",
+   "color": "#2f6db5",
+   "urban": false
+  },
+  {
+   "hi": "पश्चिमगढ़",
+   "en": "Pashchimgarh",
+   "color": "#4e8a3e",
+   "urban": false
+  },
+  {
+   "hi": "नदीपार",
+   "en": "Nadipar",
+   "color": "#8a4fa3",
+   "urban": false
+  },
+  {
+   "hi": "डेमो नगर शहर",
+   "en": "Demo Nagar City",
+   "color": "#b4572e",
+   "urban": true
+  }
+ ],
+ "castes": {
+  "unclassified": "Unclassified",
+  "colors": {
+   "Muslim": "#2e8b57",
+   "Brahmin": "#e08a1e",
+   "Kshatriya / Rajput": "#c8463a",
+   "Yadav": "#3c78c8",
+   "Kurmi / Patel / Verma": "#1fa2a2",
+   "Maurya / Shakya": "#6aa84f",
+   "Prajapati": "#d35400",
+   "Pal": "#d2691e",
+   "Nishad / Kewat / Kahar": "#4a6fa5",
+   "Gupta / Vaishya": "#c9a227",
+   "Srivastava / Kayastha": "#b0658a",
+   "Kori (SC)": "#8e44ad",
+   "Vishwakarma": "#1abc9c",
+   "Lodhi": "#a04000",
+   "Soni / Sonkar": "#b7950b",
+   "Rajbhar": "#784212",
+   "Mali / Murao": "#196f3d",
+   "Pasi (SC)": "#9b59b6",
+   "Khatik (SC)": "#6e2f1a",
+   "Chamar / Jatav (SC)": "#5e3c99",
+   "Valmiki (SC)": "#34495e",
+   "Mehtar / Bhangi (SC)": "#212f3d",
+   "Gond / Dom (SC)": "#145a32",
+   "Dhobi (SC)": "#a569bd",
+   "Nai": "#512e5f",
+   "SC (sub-caste not known)": "#7b4fa8",
+   "Unclassified": "#9a9a90"
+  },
+  "blocs": {
+   "Muslim": "Muslim",
+   "Brahmin": "Upper caste",
+   "Kshatriya / Rajput": "Upper caste",
+   "Yadav": "OBC",
+   "Kurmi / Patel / Verma": "OBC",
+   "Maurya / Shakya": "OBC",
+   "Prajapati": "OBC",
+   "Pal": "OBC",
+   "Nishad / Kewat / Kahar": "OBC",
+   "Gupta / Vaishya": "Upper caste",
+   "Srivastava / Kayastha": "Upper caste",
+   "Kori (SC)": "SC",
+   "Vishwakarma": "OBC",
+   "Lodhi": "OBC",
+   "Soni / Sonkar": "OBC",
+   "Rajbhar": "OBC",
+   "Mali / Murao": "OBC",
+   "Pasi (SC)": "SC",
+   "Khatik (SC)": "SC",
+   "Chamar / Jatav (SC)": "SC",
+   "Valmiki (SC)": "SC",
+   "Mehtar / Bhangi (SC)": "SC",
+   "Gond / Dom (SC)": "SC",
+   "Dhobi (SC)": "SC",
+   "Nai": "OBC",
+   "SC (sub-caste not known)": "SC"
+  }
+ }
+}

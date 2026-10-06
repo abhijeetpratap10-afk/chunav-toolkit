@@ -1,0 +1,19 @@
+{
+ "_about": "Copy this file to rules/<state>.json and fill in the groups for your state. Words are matched against whole words of the voter's name and the relative's name, in the roll's own script (add Latin spellings too if your rolls are in English). Groups are tried top to bottom; the first match wins, so put the most specific groups first. Colours are used by the app. 'bloc' groups communities for the vote model (e.g. Upper caste, OBC, SC, ST, Muslim, Christian).",
+ "state": "Your state",
+ "language": "eng",
+ "unclassified": { "id": "unclassified", "label": "Unclassified", "local": "Unclassified", "color": "#9a9a90" },
+ "generic_words": ["kumar", "kumari", "devi", "bai", "ben", "bhai", "lal", "ram", "prasad", "das"],
+ "prefix_rules": [ { "group": "muslim", "words": ["md", "md.", "mohd", "mohd."] } ],
+ "first_group_any_word": "muslim",
+ "compound_min_length": 8,
+ "substring_min_length": 4,
+ "last_resort": [],
+ "relative_surname_rule": null,
+ "groups": [
+  { "id": "muslim", "label": "Muslim", "local": "Muslim", "bloc": "Muslim", "color": "#2e8b57", "words": ["khan", "ahmad", "ahmed", "ansari", "qureshi", "siddiqui", "shaikh", "sheikh", "hussain", "ali"] },
+  { "id": "christian", "label": "Christian", "local": "Christian", "bloc": "Christian", "color": "#2c7fb8", "words": ["joseph", "thomas", "mathew", "george", "fernandes", "dsouza", "pereira"] },
+  { "id": "group_a", "label": "Community A", "local": "Community A", "bloc": "Bloc 1", "color": "#e08a1e", "words": ["surname1", "surname2"] },
+  { "id": "group_b", "label": "Community B", "local": "Community B", "bloc": "Bloc 2", "color": "#3c78c8", "words": ["surname3", "surname4"] }
+ ]
+}
